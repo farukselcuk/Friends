@@ -1,42 +1,53 @@
-import { Game } from '../types';
+export interface Game {
+  id: string;
+  title: string;
+  minPlayers: number;
+  maxPlayers: number;
+  category: 'kart' | 'kelime' | 'rol' | 'strateji' | 'parti';
+  description: string;
+  requirements?: string[];
+  isDigital: boolean;
+}
 
 export const games: Game[] = [
   {
     id: '1',
     title: 'Doğruluk mu Cesaret mi',
-    description: 'Klasik "Doğruluk mu Cesaret mi" oyunu. Sırayla kişiler doğruluk veya cesaret seçeneğini seçer. Doğruluk seçilirse kişiye bir soru sorulur, cesaret seçilirse yapması gereken bir görev verilir.',
     minPlayers: 2,
-    maxPlayers: 20,
-    category: 'Fiziksel',
-    location: 'Herhangi'
+    maxPlayers: 10,
+    category: 'parti',
+    description: 'Klasik bir parti oyunu. Sırayla doğruluk veya cesaret seçeneklerinden birini seçin.',
+    requirements: ['Boş şişe'],
+    isDigital: false,
   },
   {
     id: '2',
     title: 'Sessiz Sinema',
-    description: 'Bir kişi, konuşmadan ve ses çıkarmadan, sadece hareketlerle bir kelime veya film anlatmaya çalışır, diğerleri tahmin eder.',
     minPlayers: 4,
-    maxPlayers: 20,
-    category: 'Fiziksel',
-    location: 'İç Mekan'
+    maxPlayers: 12,
+    category: 'kelime',
+    description: 'Bir kişi film adını seçer ve diğerleri tahmin etmeye çalışır.',
+    isDigital: false,
   },
   {
     id: '3',
+    title: 'Mafya',
+    minPlayers: 6,
+    maxPlayers: 20,
+    category: 'rol',
+    description: 'Gizli rollerle oynanan bir sosyal dedüksiyon oyunu.',
+    requirements: ['Kartlar'],
+    isDigital: false,
+  },
+  {
+    id: '4',
     title: 'Tabu',
     description: 'Bir kelimeyi, yasaklı 5 kelimeyi kullanmadan anlatmaya çalışırsınız.',
     minPlayers: 4,
     maxPlayers: 12,
-    category: 'Kart',
+    category: 'kart',
     location: 'İç Mekan',
     materials: ['Tabu kartları veya uygulama']
-  },
-  {
-    id: '4',
-    title: 'Mafya (Köy-Kasaba)',
-    description: 'Köylüler ve mafya rollerinde bir oyun. Her gece mafya bir kişiyi öldürür, gündüz ise tüm köy kimin mafya olduğunu tahmin etmeye çalışır.',
-    minPlayers: 6,
-    maxPlayers: 20,
-    category: 'Fiziksel',
-    location: 'İç Mekan'
   },
   {
     id: '5',
@@ -44,7 +55,7 @@ export const games: Game[] = [
     description: 'Her oyuncunun alnına bir ünlü kişinin adının yazılı olduğu kağıt yapıştırılır. Oyuncular sırayla evet/hayır cevaplı sorular sorarak kim olduklarını tahmin etmeye çalışırlar.',
     minPlayers: 3,
     maxPlayers: 10,
-    category: 'Fiziksel',
+    category: 'kelime',
     location: 'Herhangi',
     materials: ['Yapışkan kağıt, kalem']
   },
@@ -54,7 +65,7 @@ export const games: Game[] = [
     description: 'Belirlenen bir harfle başlayan isim, şehir, hayvan ve eşya bulmaya çalışırsınız.',
     minPlayers: 2,
     maxPlayers: 10,
-    category: 'Fiziksel',
+    category: 'kelime',
     location: 'Herhangi',
     materials: ['Kağıt, kalem']
   },
@@ -64,7 +75,7 @@ export const games: Game[] = [
     description: 'Bir kişi bir kelime söyler, sıradaki kişi o kelimenin son harfiyle başlayan yeni bir kelime bulmalıdır.',
     minPlayers: 2,
     maxPlayers: 15,
-    category: 'Fiziksel',
+    category: 'kelime',
     location: 'Herhangi'
   },
   {
@@ -73,7 +84,7 @@ export const games: Game[] = [
     description: 'Bir kişi çizer, diğerleri ne çizdiğini tahmin etmeye çalışır.',
     minPlayers: 3,
     maxPlayers: 10,
-    category: 'Fiziksel',
+    category: 'kelime',
     location: 'İç Mekan',
     materials: ['Kağıt, kalem']
   }
