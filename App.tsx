@@ -13,18 +13,25 @@ import FriendsScreen from './src/screens/FriendsScreen';
 import EventsScreen from './src/screens/EventsScreen';
 import MessagesScreen from './src/screens/MessagesScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#fb923c',
         tabBarInactiveTintColor: '#a3a3a3',
-        tabBarStyle: { backgroundColor: '#fff', borderTopWidth: 0, height: 60 },
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopWidth: 0,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
+        },
         tabBarLabelStyle: { fontSize: 12, marginBottom: 4 },
         tabBarIcon: ({ color, size }) => {
           let iconName = 'home';
@@ -70,8 +77,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
