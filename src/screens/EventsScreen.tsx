@@ -1,61 +1,103 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TextInput, Button, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import GradientHeader from '../components/GradientHeader';
 
 export default function EventsScreen() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [created, setCreated] = useState(false);
+  const [eventName, setEventName] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [eventLocation, setEventLocation] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { colors, gradients } = useTheme();
 
-  const handleCreate = () => {
-    if (!title) return;
-    setCreated(true);
+  const handleCreateEvent = () => {
+    // Burada etkinlik oluşturma mantığı olacak
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Etkinlik Oluştur</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Etkinlik Başlığı"
-        value={title}
-        onChangeText={setTitle}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <GradientHeader 
+        title="Etkinlikler" 
+        gradientColors={gradients.primary}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Açıklama"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Yer"
-        value={location}
-        onChangeText={setLocation}
-      />
-      <View style={styles.dateRow}>
-        <Text style={styles.label}>Tarih & Saat:</Text>
-        <Button title={date.toLocaleString()} onPress={() => setShowDatePicker(true)} />
+
+      <View style={styles.content}>
+        <Card style={styles.formCard}>
+          <TextInput
+            style={[styles.input, { 
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              color: colors.text.primary
+            }]}
+            placeholder="Etkinlik Adı"
+            placeholderTextColor={colors.text.tertiary}
+            value={eventName}
+            onChangeText={setEventName}
+          />
+
+          <View style={styles.dateRow}>
+            <Text style={[styles.label, { color: colors.text.primary }]}>Tarih:</Text>
+            <TextInput
+              style={[styles.input, { 
+                flex: 1,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.text.primary
+              }]}
+              placeholder="GG/AA/YYYY"
+              placeholderTextColor={colors.text.tertiary}
+              value={eventDate}
+              onChangeText={setEventDate}
+            />
+          </View>
+
+          <View style={styles.dateRow}>
+            <Text style={[styles.label, { color: colors.text.primary }]}>Saat:</Text>
+            <TextInput
+              style={[styles.input, { 
+                flex: 1,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.text.primary
+              }]}
+              placeholder="SS:DD"
+              placeholderTextColor={colors.text.tertiary}
+              value={eventTime}
+              onChangeText={setEventTime}
+            />
+          </View>
+
+          <TextInput
+            style={[styles.input, { 
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              color: colors.text.primary
+            }]}
+            placeholder="Konum"
+            placeholderTextColor={colors.text.tertiary}
+            value={eventLocation}
+            onChangeText={setEventLocation}
+          />
+
+          <Button
+            title="Etkinlik Oluştur"
+            onPress={handleCreateEvent}
+            type="primary"
+            style={styles.createButton}
+          />
+        </Card>
+
+        {showSuccess && (
+          <Text style={[styles.success, { color: colors.status.success }]}>
+            Etkinlik başarıyla oluşturuldu!
+          </Text>
+        )}
       </View>
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="datetime"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (event.type === 'set' && selectedDate) {
-              setDate(selectedDate);
-            }
-          }}
-        />
-      )}
-      <Button title="Oluştur" onPress={handleCreate} disabled={!title} />
-      {created && <Text style={styles.success}>Etkinlik oluşturuldu! (Takvime ekleme yakında)</Text>}
     </View>
   );
 }
@@ -63,25 +105,20 @@ export default function EventsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff7ed',
+  },
+  content: {
+    flex: 1,
     padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#b45309',
-    marginTop: 32,
-    marginBottom: 20,
-    textAlign: 'center',
+  formCard: {
+    padding: 16,
   },
   input: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
     marginBottom: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#fde68a',
   },
   dateRow: {
     flexDirection: 'row',
@@ -90,11 +127,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#a16207',
     marginRight: 8,
   },
+  createButton: {
+    marginTop: 8,
+  },
   success: {
-    color: '#22c55e',
     fontWeight: 'bold',
     marginTop: 16,
     textAlign: 'center',

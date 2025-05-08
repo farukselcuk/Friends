@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '../context/ThemeContext';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import GradientHeader from '../components/GradientHeader';
 
 const starterMessages = [
   'Selam! Nasılsın?',
@@ -36,6 +40,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Chat'>;
 
 export default function MessagesScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { colors, gradients } = useTheme();
   const [friends] = useState<Friend[]>([
     { id: '1', name: 'Ahmet' },
     { id: '2', name: 'Zeynep' },
@@ -55,70 +60,93 @@ export default function MessagesScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Mesajlar</Text>
-      
-      <View style={styles.friendsList}>
-        <Text style={styles.sectionTitle}>Arkadaşlarınız</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <GradientHeader 
+        title="Mesajlar" 
+        gradientColors={gradients.primary}
+      />
+
+      <View style={styles.content}>
+        <View style={styles.friendsList}>
+          <Text style={[styles.sectionTitle, { color: colors.text.accent }]}>
+            Arkadaşlarınız
+          </Text>
+          <FlatList
+            data={friends}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity 
+                style={styles.friendItem}
+                onPress={() => startChat(item.name)}
+              >
+                <View style={[styles.friendAvatar, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.friendInitial}>{item.name.charAt(0)}</Text>
+                </View>
+                <Text style={[styles.friendName, { color: colors.text.primary }]}>
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+        
+        <View style={styles.buttonRow}>
+          <Button
+            title="Arkadaşına Mesaj Başlat"
+            onPress={startNewChat}
+            type="primary"
+            style={styles.primaryBtn}
+          />
+          <Button
+            title="Grup Sohbeti Başlat"
+            onPress={() => {}}
+            type="secondary"
+            style={styles.secondaryBtn}
+          />
+        </View>
+        
+        <Text style={[styles.sectionTitle, { color: colors.text.accent }]}>
+          Önerilen İlk Mesajlar
+        </Text>
         <FlatList
-          data={friends}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          data={starterMessages}
+          keyExtractor={item => item}
           renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={styles.friendItem}
-              onPress={() => startChat(item.name)}
+            <Card 
+              style={styles.messageCard}
+              onPress={() => {
+                if (friends.length > 0) {
+                  navigation.navigate('Chat', { 
+                    friendName: friends[0].name,
+                    initialMessage: item
+                  });
+                }
+              }}
             >
-              <View style={styles.friendAvatar}>
-                <Text style={styles.friendInitial}>{item.name.charAt(0)}</Text>
-              </View>
-              <Text style={styles.friendName}>{item.name}</Text>
-            </TouchableOpacity>
+              <Text style={[styles.messageText, { color: colors.text.primary }]}>
+                {item}
+              </Text>
+            </Card>
+          )}
+        />
+        
+        <Text style={[styles.sectionTitle, { color: colors.text.accent }]}>
+          Grup Sohbeti İçin Buz Kırıcılar
+        </Text>
+        <FlatList
+          data={groupStarters}
+          keyExtractor={item => item}
+          renderItem={({ item }) => (
+            <Card style={styles.messageCard}>
+              <Text style={[styles.messageText, { color: colors.text.primary }]}>
+                {item}
+              </Text>
+            </Card>
           )}
         />
       </View>
-      
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.primaryBtn} onPress={startNewChat}>
-          <Text style={styles.primaryBtnText}>Arkadaşına Mesaj Başlat</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryBtn}>
-          <Text style={styles.secondaryBtnText}>Grup Sohbeti Başlat</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <Text style={styles.sectionTitle}>Önerilen İlk Mesajlar</Text>
-      <FlatList
-        data={starterMessages}
-        keyExtractor={item => item}
-        renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.messageCard}
-            onPress={() => {
-              if (friends.length > 0) {
-                navigation.navigate('Chat', { 
-                  friendName: friends[0].name,
-                  initialMessage: item
-                });
-              }
-            }}
-          >
-            <Text style={styles.messageText}>{item}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      
-      <Text style={styles.sectionTitle}>Grup Sohbeti İçin Buz Kırıcılar</Text>
-      <FlatList
-        data={groupStarters}
-        keyExtractor={item => item}
-        renderItem={({ item }) => (
-          <View style={styles.messageCard}>
-            <Text style={styles.messageText}>{item}</Text>
-          </View>
-        )}
-      />
     </View>
   );
 }
@@ -126,15 +154,10 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff7ed',
-    padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#b45309',
-    marginBottom: 16,
-    textAlign: 'center',
+  content: {
+    flex: 1,
+    padding: 20,
   },
   friendsList: {
     marginBottom: 16,
@@ -147,7 +170,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#fb923c',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -158,7 +180,6 @@ const styles = StyleSheet.create({
   },
   friendName: {
     marginTop: 4,
-    color: '#b45309',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -166,47 +187,22 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   primaryBtn: {
-    backgroundColor: '#fb923c',
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    flex: 1,
     marginRight: 8,
   },
-  primaryBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
   secondaryBtn: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#fb923c',
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  secondaryBtnText: {
-    color: '#fb923c',
-    fontWeight: 'bold',
-    fontSize: 15,
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
-    color: '#a16207',
     marginTop: 18,
     marginBottom: 8,
     fontWeight: 'bold',
   },
   messageCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#fde68a',
   },
   messageText: {
     fontSize: 16,
-    color: '#b45309',
   },
 }); 
