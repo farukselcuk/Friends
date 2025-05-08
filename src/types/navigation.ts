@@ -12,19 +12,18 @@ export type MainTabParamList = {
 
 export type RootStackParamList = {
   Auth: undefined;
-  Main: {
-    screen?: keyof MainTabParamList;
-    params?: any;
-  };
-  Chat: {
-    friendName: string;
-    friendAvatar?: string;
-    initialMessage?: string;
-  };
+  Main: undefined;
   TabuGame: undefined;
   BottleSpin: undefined;
-  NewAcquaintance: undefined;
+  Chat: undefined;
+  CharadesScreen: undefined;
+  CityNameScreen: undefined;
+  WordGameScreen: undefined;
+  QuizScreen: undefined;
   EditProfile: undefined;
+  NewAcquaintance: undefined;
+  Topics: undefined;
+  Games: undefined;
 };
 
 export type NavigationProp = CompositeNavigationProp<

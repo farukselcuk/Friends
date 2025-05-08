@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, Animated, TouchableOpacity } from 'react-native';
-import { Text, TextInput } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { useTheme } from '../../context/ThemeContext';
 import GradientHeader from '../../components/GradientHeader';
 import Card from '../../components/Card';
@@ -8,18 +8,18 @@ import Button from '../../components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getWords, saveGameResult } from '../../services/database';
 
-interface TabuWord {
+interface CharadesWord {
   id: string;
   text: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  forbiddenWords: string[];
+  description?: string;
   type: 'tabu' | 'charades' | 'wordGame' | 'quiz';
 }
 
-export default function TabuGameScreen() {
+export default function CharadesScreen() {
   const { colors, gradients } = useTheme();
-  const [words, setWords] = useState<TabuWord[]>([]);
+  const [words, setWords] = useState<CharadesWord[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -37,8 +37,8 @@ export default function TabuGameScreen() {
 
   const loadWords = async () => {
     try {
-      const tabuWords = await getWords('tabu');
-      setWords(tabuWords as TabuWord[]);
+      const charadesWords = await getWords('charades');
+      setWords(charadesWords as CharadesWord[]);
       setLoading(false);
     } catch (error) {
       console.error('Error loading words:', error);
@@ -104,7 +104,7 @@ export default function TabuGameScreen() {
   const saveGame = async () => {
     try {
       await saveGameResult({
-        gameType: 'tabu',
+        gameType: 'charades',
         players: ['Takım 1', 'Takım 2'],
         scores: {
           'Takım 1': team1Score,
@@ -122,7 +122,7 @@ export default function TabuGameScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <GradientHeader 
-          title="Tabu" 
+          title="Sessiz Sinema" 
           gradientColors={gradients.primary as any}
         />
         <View style={styles.content}>
@@ -137,7 +137,7 @@ export default function TabuGameScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader 
-        title="Tabu" 
+        title="Sessiz Sinema" 
         gradientColors={gradients.primary as any}
       />
 
@@ -181,16 +181,11 @@ export default function TabuGameScreen() {
               <Text style={[styles.word, { color: colors.text.primary }]}>
                 {currentWord.text}
               </Text>
-              <View style={styles.forbiddenWords}>
-                {currentWord.forbiddenWords.map((word, index) => (
-                  <Text 
-                    key={index} 
-                    style={[styles.forbiddenWord, { color: colors.text.secondary }]}
-                  >
-                    {word}
-                  </Text>
-                ))}
-              </View>
+              {currentWord.description && (
+                <Text style={[styles.description, { color: colors.text.secondary }]}>
+                  {currentWord.description}
+                </Text>
+              )}
             </Card>
           ) : (
             <Card style={{
@@ -293,12 +288,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
-  forbiddenWords: {
-    alignItems: 'center',
-  },
-  forbiddenWord: {
-    fontSize: 18,
-    marginBottom: 8,
+  description: {
+    fontSize: 16,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   waitingText: {
     fontSize: 24,

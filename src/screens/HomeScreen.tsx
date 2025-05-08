@@ -130,6 +130,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Button
               title="Keşfet"
               onPress={() => navigation.navigate('NewAcquaintance')}
+              type="primary"
             />
           </View>
         </Card>
@@ -142,20 +143,23 @@ export default function HomeScreen({ navigation }: Props) {
           </Text>
           <View style={styles.cardFooter}>
             <TouchableOpacity onPress={() => {
-              navigation.navigate('Main', { screen: 'Home' });
+              navigation.navigate('Topics');
             }}>
               <Text style={[styles.linkText, { color: colors.text.accent }]}>
                 Tüm Konular
               </Text>
             </TouchableOpacity>
-            <Button
-              title="Başlat"
-              onPress={handleStartTopic}
-            />
+            <TouchableOpacity onPress={() => {
+              navigation.navigate('Messages');
+            }}>
+              <Text style={[styles.linkText, { color: colors.text.accent }]}>
+                Paylaş
+              </Text>
+            </TouchableOpacity>
           </View>
         </Card>
 
-        {/* Oyun Önerisi */}
+        {/* Önerilen Oyun */}
         <Card>
           {renderCardHeader('gamepad-variant', 'Önerilen Oyun')}
           <Text style={[styles.cardText, { color: colors.text.secondary }]}>
@@ -163,16 +167,19 @@ export default function HomeScreen({ navigation }: Props) {
           </Text>
           <View style={styles.cardFooter}>
             <TouchableOpacity onPress={() => {
-              navigation.navigate('Main', { screen: 'Home' });
+              navigation.navigate('Games');
             }}>
               <Text style={[styles.linkText, { color: colors.text.accent }]}>
                 Tüm Oyunlar
               </Text>
             </TouchableOpacity>
-            <Button 
-              title="Başlat"
-              onPress={handleStartGame}
-            />
+            <TouchableOpacity onPress={() => {
+              navigation.navigate('Games');
+            }}>
+              <Text style={[styles.linkText, { color: colors.text.accent }]}>
+                Oyun Seç
+              </Text>
+            </TouchableOpacity>
           </View>
         </Card>
 
@@ -186,7 +193,8 @@ export default function HomeScreen({ navigation }: Props) {
             <View />
             <Button
               title="Etkinlik Oluştur"
-              onPress={() => navigation.navigate('Main', { screen: 'Events' })}
+              onPress={() => navigation.navigate('Events')}
+              type="primary"
             />
           </View>
         </Card>

@@ -18,6 +18,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TabuGameScreen from './src/screens/games/TabuGameScreen';
 import BottleSpinScreen from './src/screens/games/BottleSpinScreen';
+import TopicsScreen from './src/screens/TopicsScreen';
+import GamesScreen from './src/screens/GamesScreen';
 import { RootStackParamList, MainTabParamList } from './src/types/navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -93,6 +95,8 @@ function AppContent() {
               <Stack.Screen name="Chat" component={ChatScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
               <Stack.Screen name="NewAcquaintance" component={NewAcquaintanceScreen} />
+              <Stack.Screen name="Topics" component={TopicsScreen} />
+              <Stack.Screen name="Games" component={GamesScreen} />
             </>
           )}
         </Stack.Navigator>
