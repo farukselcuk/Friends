@@ -24,11 +24,7 @@ const getCategoryIcon = (category: string) => {
   }
 };
 
-type Props = {
-  navigation: NavigationProp;
-};
-
-const gameList: Game[] = [
+const gameList: (Game & { screen?: string })[] = [
   {
     id: '1',
     title: 'Tabu',
@@ -38,17 +34,18 @@ const gameList: Game[] = [
     duration: '30-45 dk',
     difficulty: 'Orta',
     category: 'Kelime',
-    requirements: ['Tabu kartları', 'Kum saati'],
+    screen: 'TabuGame',
   },
   {
     id: '2',
-    title: 'Sessiz Sinema',
-    description: 'Film isimlerini sadece hareketlerle anlatmaya çalışın!',
-    minPlayers: 3,
+    title: 'Şişe Çevirmece',
+    description: 'Şişeyi çevir, rastgele bir oyuncu seç!',
+    minPlayers: 2,
     maxPlayers: 10,
-    duration: '20-30 dk',
+    duration: '5-10 dk',
     difficulty: 'Kolay',
     category: 'Parti',
+    screen: 'BottleSpin',
   },
   {
     id: '3',
@@ -59,10 +56,13 @@ const gameList: Game[] = [
     duration: '45-60 dk',
     difficulty: 'Zor',
     category: 'Bilgi',
-    requirements: ['Soru kartları', 'Joker hakkı kartları'],
   },
   // Daha fazla oyun eklenebilir
 ];
+
+type Props = {
+  navigation: NavigationProp;
+};
 
 export default function GamesScreen({ navigation }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('Tümü');
@@ -130,12 +130,11 @@ export default function GamesScreen({ navigation }: Props) {
             </View>
           </Card.Content>
           <Card.Actions>
-            <Button mode="text" onPress={() => showGameDetails(game)}>
-              Detaylar
-            </Button>
-            <Button mode="contained" onPress={() => {}}>
-              Başlat
-            </Button>
+            {game.screen ? (
+              <Button mode="contained" onPress={() => navigation.navigate(game.screen as never)}>
+                Oyna
+              </Button>
+            ) : null}
           </Card.Actions>
         </Card>
       ))}

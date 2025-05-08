@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { Card, Text, Button, Portal, Dialog, Paragraph } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { Text, Portal, Dialog, Paragraph } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { NavigationProp } from '../types/navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Game } from '../types/models';
+import { useTheme } from '../context/ThemeContext';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import GradientHeader from '../components/GradientHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const amber = '#fb923c';
-const orange = '#f59e42';
+const todaysTopic = {
+  title: 'Günün Konusu',
+  description: 'Bugün en son ne zaman kendinizi gerçekten mutlu hissettiniz?',
+};
 
 const games: Game[] = [
   {
@@ -42,17 +49,13 @@ const games: Game[] = [
   },
 ];
 
-const todaysTopic = {
-  title: 'Günün Konusu',
-  description: 'Bugün en son ne zaman kendinizi gerçekten mutlu hissettiniz?',
-};
-
 type Props = {
   navigation: NavigationProp;
 };
 
 export default function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
+  const { colors, gradients } = useTheme();
   const [topicDialogVisible, setTopicDialogVisible] = useState(false);
   const [gameDialogVisible, setGameDialogVisible] = useState(false);
   const [playerCount, setPlayerCount] = useState('');
@@ -88,109 +91,191 @@ export default function HomeScreen({ navigation }: Props) {
     setGameError('');
   };
 
+  const renderCardHeader = (icon: string, title: string) => (
+    <View style={styles.cardHeader}>
+      <Icon name={icon} size={22} color={colors.text.accent} style={styles.cardIcon} />
+      <Text style={[styles.cardHeaderTitle, { color: colors.text.primary }]}>
+        {title}
+      </Text>
+    </View>
+  );
+
   return (
-    <View style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Status Bar */}
-        <View style={styles.statusBar}>
-          <Text style={styles.statusText}>4:05</Text>
-          <View style={{ flexDirection: 'row', gap: 6 }}>
-            <View style={styles.statusDot} />
-            <View style={styles.statusDot} />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <GradientHeader 
+        title="Ana Sayfa" 
+        gradientColors={gradients.primary as any}
+      />
+
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Welcome Section */}
+        <View style={styles.welcomeSection}>
+          <Text style={[styles.welcomeTitle, { color: colors.text.accent }]}>
+            Hoş Geldin, {user?.username}! 👋
+          </Text>
+          <Text style={[styles.welcomeSubtitle, { color: colors.text.secondary }]}>
+            Bugün arkadaşlarınla ne yapmak istersin?
+          </Text>
+        </View>
+
+        {/* Yeni Tanışma Modu */}
+        <Card>
+          {renderCardHeader('account-multiple-plus', 'Yeni Tanışma Modu')}
+          <Text style={[styles.cardText, { color: colors.text.secondary }]}>
+            Yeni insanlarla tanışmak için özel sohbet konuları ve soru önerileri!
+          </Text>
+          <View style={styles.cardFooter}>
+            <View />
+            <Button
+              title="Keşfet"
+              onPress={() => navigation.navigate('NewAcquaintance')}
+            />
           </View>
-        </View>
-        {/* Header */}
-        <View style={styles.headerGradient}>
-          <Text style={styles.headerTitle}>Ana Sayfa</Text>
-        </View>
-        {/* Welcome */}
-        <View style={styles.welcomeBox}>
-          <Text style={styles.welcomeTitle}>Hoş Geldin, {user?.username}!</Text>
-          <Text style={styles.welcomeSubtitle}>Bugün arkadaşlarınla ne yapmak istersin?</Text>
-        </View>
+        </Card>
+
         {/* Günün Konusu */}
-        <View style={styles.cardBox}>
-          <View style={styles.cardHeader}>
-            <Icon name="message-text" size={18} color={amber} style={{ marginRight: 8 }} />
-            <Text style={styles.cardHeaderTitle}>Günün Konusu</Text>
-          </View>
-          <Text style={styles.cardText}>{todaysTopic.description}</Text>
-          <View style={styles.cardActionsRow}>
-            <TouchableOpacity onPress={() => navigation.navigate('Topics')}>
-              <Text style={styles.linkBtn}>Tüm Konular</Text>
+        <Card>
+          {renderCardHeader('message-text', 'Günün Konusu')}
+          <Text style={[styles.cardText, { color: colors.text.secondary }]}>
+            {todaysTopic.description}
+          </Text>
+          <View style={styles.cardFooter}>
+            <TouchableOpacity onPress={() => {
+              navigation.navigate('Main', { screen: 'Home' });
+            }}>
+              <Text style={[styles.linkText, { color: colors.text.accent }]}>
+                Tüm Konular
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleStartTopic}>
-              <Text style={styles.primaryBtnText}>Başlat</Text>
-            </TouchableOpacity>
+            <Button
+              title="Başlat"
+              onPress={handleStartTopic}
+            />
           </View>
-        </View>
+        </Card>
+
         {/* Oyun Önerisi */}
-        <View style={styles.cardBox}>
-          <View style={styles.cardHeader}>
-            <Icon name="account-group" size={18} color={amber} style={{ marginRight: 8 }} />
-            <Text style={styles.cardHeaderTitle}>Önerilen Oyun</Text>
-          </View>
-          <Text style={styles.cardText}>Oyun önerisi almak için oyuncu sayısını girin!</Text>
-          <View style={styles.cardActionsRow}>
-            <TouchableOpacity onPress={() => navigation.navigate('Games')}>
-              <Text style={styles.linkBtn}>Tüm Oyunlar</Text>
+        <Card>
+          {renderCardHeader('gamepad-variant', 'Önerilen Oyun')}
+          <Text style={[styles.cardText, { color: colors.text.secondary }]}>
+            Oyun önerisi almak için oyuncu sayısını girin!
+          </Text>
+          <View style={styles.cardFooter}>
+            <TouchableOpacity onPress={() => {
+              navigation.navigate('Main', { screen: 'Home' });
+            }}>
+              <Text style={[styles.linkText, { color: colors.text.accent }]}>
+                Tüm Oyunlar
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleStartGame}>
-              <Text style={styles.primaryBtnText}>Başlat</Text>
-            </TouchableOpacity>
+            <Button 
+              title="Başlat"
+              onPress={handleStartGame}
+            />
           </View>
-        </View>
+        </Card>
+
         {/* Etkinlik */}
-        <View style={styles.cardBox}>
-          <View style={styles.cardHeader}>
-            <Icon name="calendar" size={18} color={amber} style={{ marginRight: 8 }} />
-            <Text style={styles.cardHeaderTitle}>Arkadaşlarınla Buluş</Text>
+        <Card>
+          {renderCardHeader('calendar', 'Arkadaşlarınla Buluş')}
+          <Text style={[styles.cardText, { color: colors.text.secondary }]}>
+            Yeni bir etkinlik planla ve arkadaşlarını davet et!
+          </Text>
+          <View style={styles.cardFooter}>
+            <View />
+            <Button
+              title="Etkinlik Oluştur"
+              onPress={() => navigation.navigate('Main', { screen: 'Events' })}
+            />
           </View>
-          <Text style={styles.cardText}>Yeni bir etkinlik planla ve arkadaşlarını davet et!</Text>
-          <View style={[styles.cardActionsRow, { justifyContent: 'flex-end' }] }>
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate('Events')}>
-              <Text style={styles.primaryBtnText}>Etkinlik Oluştur</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        </Card>
       </ScrollView>
+
+      {/* Modals */}
       {/* Günün Konusu Modal */}
       <Portal>
-        <Dialog visible={topicDialogVisible} onDismiss={() => setTopicDialogVisible(false)}>
-          <Dialog.Title>Günün Konusu</Dialog.Title>
+        <Dialog 
+          visible={topicDialogVisible} 
+          onDismiss={() => setTopicDialogVisible(false)}
+          style={{ backgroundColor: colors.card }}
+        >
+          <Dialog.Title style={{ color: colors.text.primary }}>Günün Konusu</Dialog.Title>
           <Dialog.Content>
-            <Paragraph>{todaysTopic.description}</Paragraph>
+            <Paragraph style={{ color: colors.text.secondary }}>{todaysTopic.description}</Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setTopicDialogVisible(false)}>Kapat</Button>
-            <Button onPress={() => { setTopicDialogVisible(false); }}>Paylaş</Button>
+            <Button 
+              title="Kapat"
+              onPress={() => setTopicDialogVisible(false)}
+              type="outline"
+              size="small"
+            />
+            <Button 
+              title="Paylaş"
+              onPress={() => { setTopicDialogVisible(false); }}
+              size="small"
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>
+
       {/* Oyun Önerisi Modal */}
       <Portal>
-        <Dialog visible={gameDialogVisible} onDismiss={() => setGameDialogVisible(false)}>
-          <Dialog.Title>Oyun Önerisi</Dialog.Title>
+        <Dialog 
+          visible={gameDialogVisible} 
+          onDismiss={() => setGameDialogVisible(false)}
+          style={{ backgroundColor: colors.card }}
+        >
+          <Dialog.Title style={{ color: colors.text.primary }}>Oyun Önerisi</Dialog.Title>
           <Dialog.Content>
             <TextInput
               placeholder="Oyuncu sayısı"
               value={playerCount}
               onChangeText={setPlayerCount}
               keyboardType="numeric"
-              style={{ marginBottom: 12, backgroundColor: '#fff' }}
+              style={[
+                styles.input, 
+                { 
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  color: colors.text.primary
+                }
+              ]}
             />
-            <Button mode="contained" onPress={suggestGame} style={{ marginBottom: 8 }}>Öner</Button>
-            {gameError ? <Text style={{ color: 'red', marginBottom: 8 }}>{gameError}</Text> : null}
+            <Button
+              title="Öner"
+              onPress={suggestGame}
+              style={{ marginVertical: 10 }}
+              size="small"
+            />
+            {gameError ? (
+              <Text style={{ color: colors.status.error, marginBottom: 8 }}>
+                {gameError}
+              </Text>
+            ) : null}
             {suggestedGame && (
               <View style={{ marginTop: 8 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{suggestedGame.title}</Text>
-                <Text>{suggestedGame.description}</Text>
-                <Text style={{ color: '#a16207', marginTop: 4 }}>{suggestedGame.minPlayers}-{suggestedGame.maxPlayers} Kişi • {suggestedGame.duration} • {suggestedGame.difficulty} Zorluk</Text>
+                <Text style={[styles.gameTitle, { color: colors.text.primary }]}>
+                  {suggestedGame.title}
+                </Text>
+                <Text style={{ color: colors.text.secondary }}>
+                  {suggestedGame.description}
+                </Text>
+                <Text style={[styles.gameDetails, { color: colors.text.accent }]}>
+                  {suggestedGame.minPlayers}-{suggestedGame.maxPlayers} Kişi • 
+                  {suggestedGame.duration} • {suggestedGame.difficulty} Zorluk
+                </Text>
               </View>
             )}
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setGameDialogVisible(false)}>Kapat</Button>
+            <Button 
+              title="Kapat"
+              onPress={() => setGameDialogVisible(false)}
+              type="outline"
+              size="small"
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -199,130 +284,64 @@ export default function HomeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  gradientBg: {
+  container: {
     flex: 1,
-    backgroundColor: '#fff7ed',
   },
-  scrollContent: {
-    paddingBottom: 12,
+  content: {
+    padding: 16,
+    paddingBottom: 24,
   },
-  statusBar: {
-    backgroundColor: '#ffedd5',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  statusText: {
-    fontSize: 14,
-    color: '#a3a3a3',
-  },
-  statusDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#a3a3a3',
-  },
-  headerGradient: {
-    backgroundColor: '#fb923c',
-    padding: 14,
-    shadowColor: '#fb923c',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 26,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  welcomeBox: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+  welcomeSection: {
+    marginVertical: 16,
   },
   welcomeTitle: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#b45309',
-    letterSpacing: 0.2,
+    marginBottom: 4,
   },
   welcomeSubtitle: {
-    color: '#f59e42',
-    fontWeight: '500',
-    marginTop: 6,
-    fontSize: 18,
-  },
-  cardBox: {
-    backgroundColor: '#fff7ed',
-    borderRadius: 18,
-    padding: 16,
-    marginHorizontal: 8,
-    marginBottom: 10,
-    shadowColor: '#fb923c',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#fde68a',
+    fontSize: 16,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
+  },
+  cardIcon: {
+    marginRight: 10,
   },
   cardHeaderTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#b45309',
-    fontSize: 20,
   },
   cardText: {
-    color: '#a16207',
-    fontWeight: '500',
-    marginBottom: 6,
-    fontSize: 17,
+    fontSize: 16,
+    marginBottom: 12,
   },
-  chipRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 6,
-  },
-  chip: {
-    backgroundColor: '#fde68a',
-    color: '#b45309',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    fontSize: 14,
-    marginRight: 6,
-    fontWeight: 'bold',
-  },
-  cardActionsRow: {
+  cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
-  linkBtn: {
-    color: '#fb923c',
-    fontWeight: 'bold',
+  linkText: {
     fontSize: 16,
+    fontWeight: '500',
   },
-  primaryBtn: {
-    backgroundColor: '#fb923c',
-    borderRadius: 999,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    shadowColor: '#fb923c',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 2,
+  input: {
+    height: 45,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
   },
-  primaryBtnText: {
-    color: '#fff',
+  gameTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 17,
+    marginBottom: 4,
+  },
+  gameDetails: {
+    fontSize: 14,
+    marginTop: 4,
   },
 }); 
